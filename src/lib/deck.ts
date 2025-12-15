@@ -1,0 +1,101 @@
+import type { Card, Deck } from './types';
+
+const MAJOR_ARCANA: Card[] = [
+  { id: 'major_00', name: 'The Fool', image: '/cards/major_00.png' },
+  { id: 'major_01', name: 'The Magician', image: '/cards/major_01.png' },
+  { id: 'major_02', name: 'The High Priestess', image: '/cards/major_02.png' },
+  { id: 'major_03', name: 'The Empress', image: '/cards/major_03.png' },
+  { id: 'major_04', name: 'The Emperor', image: '/cards/major_04.png' },
+  { id: 'major_05', name: 'The Hierophant', image: '/cards/major_05.png' },
+  { id: 'major_06', name: 'The Lovers', image: '/cards/major_06.png' },
+  { id: 'major_07', name: 'The Chariot', image: '/cards/major_07.png' },
+  { id: 'major_08', name: 'Strength', image: '/cards/major_08.png' },
+  { id: 'major_09', name: 'The Hermit', image: '/cards/major_09.png' },
+  { id: 'major_10', name: 'Wheel of Fortune', image: '/cards/major_10.png' },
+  { id: 'major_11', name: 'Justice', image: '/cards/major_11.png' },
+  { id: 'major_12', name: 'The Hanged Man', image: '/cards/major_12.png' },
+  { id: 'major_13', name: 'Death', image: '/cards/major_13.png' },
+  { id: 'major_14', name: 'Temperance', image: '/cards/major_14.png' },
+  { id: 'major_15', name: 'The Devil', image: '/cards/major_15.png' },
+  { id: 'major_16', name: 'The Tower', image: '/cards/major_16.png' },
+  { id: 'major_17', name: 'The Star', image: '/cards/major_17.png' },
+  { id: 'major_18', name: 'The Moon', image: '/cards/major_18.png' },
+  { id: 'major_19', name: 'The Sun', image: '/cards/major_19.png' },
+  { id: 'major_20', name: 'Judgement', image: '/cards/major_20.png' },
+  { id: 'major_21', name: 'The World', image: '/cards/major_21.png' },
+];
+
+const WANDS: Card[] = [
+  { id: 'wands_01', name: 'Ace of Wands', image: '/cards/wands_01.png' },
+  { id: 'wands_02', name: 'Two of Wands', image: '/cards/wands_02.png' },
+  { id: 'wands_03', name: 'Three of Wands', image: '/cards/wands_03.png' },
+  { id: 'wands_04', name: 'Four of Wands', image: '/cards/wands_04.png' },
+  { id: 'wands_05', name: 'Five of Wands', image: '/cards/wands_05.png' },
+  { id: 'wands_06', name: 'Six of Wands', image: '/cards/wands_06.png' },
+  { id: 'wands_07', name: 'Seven of Wands', image: '/cards/wands_07.png' },
+  { id: 'wands_08', name: 'Eight of Wands', image: '/cards/wands_08.png' },
+  { id: 'wands_09', name: 'Nine of Wands', image: '/cards/wands_09.png' },
+  { id: 'wands_10', name: 'Ten of Wands', image: '/cards/wands_10.png' },
+  { id: 'wands_11', name: 'Page of Wands', image: '/cards/wands_11.png' },
+  { id: 'wands_12', name: 'Knight of Wands', image: '/cards/wands_12.png' },
+  { id: 'wands_13', name: 'Queen of Wands', image: '/cards/wands_13.png' },
+  { id: 'wands_14', name: 'King of Wands', image: '/cards/wands_14.png' },
+];
+
+const CUPS: Card[] = [
+  { id: 'cups_01', name: 'Ace of Cups', image: '/cards/cups_01.png' },
+  { id: 'cups_02', name: 'Two of Cups', image: '/cards/cups_02.png' },
+  { id: 'cups_03', name: 'Three of Cups', image: '/cards/cups_03.png' },
+  { id: 'cups_04', name: 'Four of Cups', image: '/cards/cups_04.png' },
+  { id: 'cups_05', name: 'Five of Cups', image: '/cards/cups_05.png' },
+  { id: 'cups_06', name: 'Six of Cups', image: '/cards/cups_06.png' },
+  { id: 'cups_07', name: 'Seven of Cups', image: '/cards/cups_07.png' },
+  { id: 'cups_08', name: 'Eight of Cups', image: '/cards/cups_08.png' },
+  { id: 'cups_09', name: 'Nine of Cups', image: '/cards/cups_09.png' },
+  { id: 'cups_10', name: 'Ten of Cups', image: '/cards/cups_10.png' },
+  { id: 'cups_11', name: 'Page of Cups', image: '/cards/cups_11.png' },
+  { id: 'cups_12', name: 'Knight of Cups', image: '/cards/cups_12.png' },
+  { id: 'cups_13', name: 'Queen of Cups', image: '/cards/cups_13.png' },
+  { id: 'cups_14', name: 'King of Cups', image: '/cards/cups_14.png' },
+];
+
+const SWORDS: Card[] = [
+  { id: 'swords_01', name: 'Ace of Swords', image: '/cards/swords_01.png' },
+  { id: 'swords_02', name: 'Two of Swords', image: '/cards/swords_02.png' },
+  { id: 'swords_03', name: 'Three of Swords', image: '/cards/swords_03.png' },
+  { id: 'swords_04', name: 'Four of Swords', image: '/cards/swords_04.png' },
+  { id: 'swords_05', name: 'Five of Swords', image: '/cards/swords_05.png' },
+  { id: 'swords_06', name: 'Six of Swords', image: '/cards/swords_06.png' },
+  { id: 'swords_07', name: 'Seven of Swords', image: '/cards/swords_07.png' },
+  { id: 'swords_08', name: 'Eight of Swords', image: '/cards/swords_08.png' },
+  { id: 'swords_09', name: 'Nine of Swords', image: '/cards/swords_09.png' },
+  { id: 'swords_10', name: 'Ten of Swords', image: '/cards/swords_10.png' },
+  { id: 'swords_11', name: 'Page of Swords', image: '/cards/swords_11.png' },
+  { id: 'swords_12', name: 'Knight of Swords', image: '/cards/swords_12.png' },
+  { id: 'swords_13', name: 'Queen of Swords', image: '/cards/swords_13.png' },
+  { id: 'swords_14', name: 'King of Swords', image: '/cards/swords_14.png' },
+];
+
+const PENTACLES: Card[] = [
+  { id: 'pentacles_01', name: 'Ace of Pentacles', image: '/cards/pentacles_01.png' },
+  { id: 'pentacles_02', name: 'Two of Pentacles', image: '/cards/pentacles_02.png' },
+  { id: 'pentacles_03', name: 'Three of Pentacles', image: '/cards/pentacles_03.png' },
+  { id: 'pentacles_04', name: 'Four of Pentacles', image: '/cards/pentacles_04.png' },
+  { id: 'pentacles_05', name: 'Five of Pentacles', image: '/cards/pentacles_05.png' },
+  { id: 'pentacles_06', name: 'Six of Pentacles', image: '/cards/pentacles_06.png' },
+  { id: 'pentacles_07', name: 'Seven of Pentacles', image: '/cards/pentacles_07.png' },
+  { id: 'pentacles_08', name: 'Eight of Pentacles', image: '/cards/pentacles_08.png' },
+  { id: 'pentacles_09', name: 'Nine of Pentacles', image: '/cards/pentacles_09.png' },
+  { id: 'pentacles_10', name: 'Ten of Pentacles', image: '/cards/pentacles_10.png' },
+  { id: 'pentacles_11', name: 'Page of Pentacles', image: '/cards/pentacles_11.png' },
+  { id: 'pentacles_12', name: 'Knight of Pentacles', image: '/cards/pentacles_12.png' },
+  { id: 'pentacles_13', name: 'Queen of Pentacles', image: '/cards/pentacles_13.png' },
+  { id: 'pentacles_14', name: 'King of Pentacles', image: '/cards/pentacles_14.png' },
+];
+
+export const STANDARD_DECK: Deck = {
+  id: 'standard',
+  name: 'Rider-Waite Smith',
+  themePrompt: 'Classic medieval symbology with rich colors, archetypal figures, and traditional tarot iconography in the style of Pamela Colman Smith',
+  cards: [...MAJOR_ARCANA, ...WANDS, ...CUPS, ...SWORDS, ...PENTACLES],
+};
