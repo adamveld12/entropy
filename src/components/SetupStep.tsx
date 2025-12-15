@@ -1,11 +1,13 @@
 'use client';
 
 import { memo } from 'react';
+import { Spinner } from './Spinner';
 
 interface SetupStepProps {
   intention: string;
   cardCount: number;
   positions: string[];
+  loading?: boolean;
   onIntentionChange: (value: string) => void;
   onCardCountChange: (count: number) => void;
   onPositionsChange: (positions: string[]) => void;
@@ -16,6 +18,7 @@ export default memo(function SetupStep({
   intention,
   cardCount,
   positions,
+  loading = false,
   onIntentionChange,
   onCardCountChange,
   onPositionsChange,
@@ -85,10 +88,17 @@ export default memo(function SetupStep({
 
       <button
         onClick={onSubmit}
-        disabled={!isValid}
+        disabled={!isValid || loading}
         className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-900 font-bold py-3 px-6 rounded transition-colors"
       >
-        Begin Reading
+        {loading ? (
+          <>
+            <Spinner className="text-slate-900 mr-2" />
+            Generating Questions...
+          </>
+        ) : (
+          'Generate Questions'
+        )}
       </button>
     </div>
   );

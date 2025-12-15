@@ -14,15 +14,22 @@ export default function Home() {
   const wizard = useWizard();
   const [reading, setReading] = useState('');
   const [streaming, setStreaming] = useState(false);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   const handleSetupSubmit = async () => {
-    const res = await fetch('/api/questions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ intention: wizard.state.intention }),
-    });
-    const { questions } = await res.json();
-    wizard.setQuestions(questions);
+    try {
+      setLoadingQuestions(true);
+      const res = await fetch('/api/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ intention: wizard.state.intention }),
+      });
+      if (!res.ok) throw new Error('Failed to generate questions');
+      const { questions } = await res.json();
+      wizard.setQuestions(questions);
+    } finally {
+      setLoadingQuestions(false);
+    }
   };
 
   const handleQuestionsSubmit = async () => {
@@ -86,6 +93,7 @@ export default function Home() {
             onCardCountChange={wizard.setCardCount}
             onPositionsChange={wizard.setPositions}
             onSubmit={handleSetupSubmit}
+            loading={loadingQuestions}
           />
         )}
 

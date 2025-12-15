@@ -1,6 +1,7 @@
 'use client';
 
 import { memo } from 'react';
+import { Spinner } from './Spinner';
 
 import type { DrawnCard } from '@/lib/types';
 
@@ -45,7 +46,14 @@ export default memo(function DrawStep({
         disabled={streaming}
         className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 text-slate-900 font-bold py-3 px-6 rounded transition-colors"
       >
-        {streaming ? 'Reading...' : 'Get Your Reading'}
+        {streaming ? (
+          <>
+            <Spinner className="text-slate-900 mr-2" />
+            Reading the cards...
+          </>
+        ) : (
+          'Get Your Reading'
+        )}
       </button>
     </div>
   );
