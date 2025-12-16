@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useWizard } from '@/hooks/useWizard';
 import SetupStep from '@/components/SetupStep';
 import QuestionsStep from '@/components/QuestionsStep';
@@ -8,13 +9,44 @@ import DrawStep from '@/components/DrawStep';
 import ReadingStep from '@/components/ReadingStep';
 import { createSeededRNG, drawCards } from '@/lib/entropy';
 import { STANDARD_DECK } from '@/lib/deck';
-import type { ReadingContext } from '@/lib/types';
+import { decodeReading, sharedReadingToCards } from '@/lib/share';
+import type { ReadingContext, ShareableReading } from '@/lib/types';
 
 export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-950" />}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
   const wizard = useWizard();
+  const searchParams = useSearchParams();
   const [reading, setReading] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [sharedReading, setSharedReading] = useState<ShareableReading | null>(null);
+  const [shareError, setShareError] = useState(false);
+
+  useEffect(() => {
+    const encoded = searchParams.get('r');
+    if (encoded) {
+      const decoded = decodeReading(encoded);
+      if (decoded) {
+        setSharedReading(decoded);
+      } else {
+        setShareError(true);
+      }
+    }
+  }, [searchParams]);
+
+  const handleReset = () => {
+    setSharedReading(null);
+    setShareError(false);
+    wizard.reset();
+    window.history.pushState({}, '', '/');
+  };
 
   const handleSetupSubmit = async () => {
     try {
@@ -84,6 +116,14 @@ export default function Home() {
           <p className="text-slate-400 mt-2">A Tarot Reading Experience</p>
         </div>
 
+        {shareError && !sharedReading && (
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-center">
+            <p className="text-red-400 text-sm">
+              There was something wrong with the reading you tried to see. Ask the person to share it again.
+            </p>
+          </div>
+        )}
+
         {wizard.state.step === 'setup' && (
           <SetupStep
             intention={wizard.state.intention}
@@ -114,8 +154,16 @@ export default function Home() {
           />
         )}
 
-        {wizard.state.step === 'reading' && (
-          <ReadingStep reading={reading} onReset={wizard.reset} />
+        {(wizard.state.step === 'reading' || sharedReading) && (
+          <ReadingStep
+            reading={sharedReading?.t ?? reading}
+            cards={sharedReading ? sharedReadingToCards(sharedReading) : wizard.state.drawnCards}
+            questions={sharedReading?.q ?? wizard.state.questions}
+            answers={sharedReading?.a ?? wizard.state.answers}
+            intention={sharedReading?.i ?? wizard.state.intention}
+            isShared={!!sharedReading}
+            onReset={handleReset}
+          />
         )}
       </div>
     </div>

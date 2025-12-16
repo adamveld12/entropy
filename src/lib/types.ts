@@ -33,3 +33,12 @@ export type WizardState = {
   answers: string[];
   drawnCards: DrawnCard[];
 };
+
+export type ShareableReading = {
+  v: 1;
+  i: string;
+  q: string[];
+  a: string[];
+  c: Array<{ n: string; r: boolean; m: string }>;
+  t: string;
+};
