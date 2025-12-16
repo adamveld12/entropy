@@ -4,15 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "drizzle-kit migrate && next build",
     "start": "next start",
     "lint": "eslint",
-    "setup": "node scripts/setup-env.mjs"
+    "setup": "node scripts/setup-env.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@neondatabase/serverless": "^1.0.2",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "drizzle-orm": "^0.45.1",
     "next": "16.0.10",
     "react": "19.2.1",
     "react-dom": "19.2.1",
@@ -25,6 +29,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/seedrandom": "^3.0.8",
+    "dotenv": "^17.2.1",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "playwright": "^1.54.1",

@@ -97,6 +97,17 @@ function HomeContent() {
       await readingStore.save(reading);
       const readings = await readingStore.getAll();
       setSavedReadings(readings);
+
+      // Save generated readings to backend (fire-and-forget)
+      if (!reading.shared) {
+        fetch("/api/readings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reading),
+        }).catch((error) => {
+          console.error("Failed to save reading to backend:", error);
+        });
+      }
     }
   };
 
