@@ -77,7 +77,7 @@ function HomeContent() {
           sharedReading.i,
           sharedReadingToCards(sharedReading),
         );
-        setTitle(readingTitle);
+        setTitle(readingTitle ?? '');
       }
 
       await saveReadingToHistory({
