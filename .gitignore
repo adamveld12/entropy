@@ -46,3 +46,6 @@ next-env.d.ts
 # claude
 plans/
 .claude/settings.local.json
+
+# drizzle migrations
+!drizzle/**/*.sql
