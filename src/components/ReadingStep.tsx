@@ -87,6 +87,16 @@ export default memo(function ReadingStep({
         </div>
       </section>
 
+      {/* Intention Section */}
+      <section>
+        <h2 className="text-amber-500 font-semibold text-lg mb-4">
+          Your Intention
+        </h2>
+        <div className="bg-slate-800 rounded-lg p-4">
+          <p className="text-slate-300 text-sm">{intention}</p>
+        </div>
+      </section>
+
       {/* Questions & Answers Section */}
       <section>
         <h2 className="text-amber-500 font-semibold text-lg mb-4">
