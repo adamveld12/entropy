@@ -14,6 +14,7 @@ export function encodeReading(
     a: answers,
     c: cards.map((card) => ({ n: card.name, r: card.reversed, m: card.meaning })),
     t: reading,
+    d: Date.now(),
   };
   return btoa(encodeURIComponent(JSON.stringify(data)));
 }
@@ -38,4 +39,11 @@ export function sharedReadingToCards(reading: ShareableReading): DrawnCard[] {
     position: i,
     meaning: c.m,
   }));
+}
+
+export function formatReadingDate(timestamp: number): string {
+  return new Date(timestamp).toLocaleString(undefined, {
+    dateStyle: 'long',
+    timeStyle: 'short',
+  });
 }

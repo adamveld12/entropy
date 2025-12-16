@@ -10,7 +10,6 @@ interface ReadingStepProps {
   questions: string[];
   answers: string[];
   intention: string;
-  isShared?: boolean;
   onReset: () => void;
 }
 
@@ -20,7 +19,6 @@ export default memo(function ReadingStep({
   questions,
   answers,
   intention,
-  isShared,
   onReset,
 }: ReadingStepProps) {
   const [copied, setCopied] = useState(false);
@@ -35,11 +33,6 @@ export default memo(function ReadingStep({
 
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-8">
-      {isShared && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-2 text-center">
-          <p className="text-amber-400 text-sm">Shared Reading</p>
-        </div>
-      )}
       {/* Cards Section */}
       <section>
         <h2 className="text-amber-500 font-semibold text-lg mb-4">Cards Drawn</h2>
@@ -90,7 +83,7 @@ export default memo(function ReadingStep({
           onClick={onReset}
           className="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded transition-colors"
         >
-          {isShared ? 'Start Your Own' : 'New Reading'}
+          New Reading
         </button>
       </div>
     </div>
