@@ -15,6 +15,7 @@ interface ReadingStepProps {
   answers: string[];
   intention: string;
   onReset: () => void;
+  onBack?: () => void;
 }
 
 export default memo(function ReadingStep({
@@ -27,6 +28,7 @@ export default memo(function ReadingStep({
   answers,
   intention,
   onReset,
+  onBack,
 }: ReadingStepProps) {
   const [copied, setCopied] = useState(false);
 
@@ -47,6 +49,16 @@ export default memo(function ReadingStep({
 
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-8">
+      {/* Back Button */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-2"
+        >
+          ← Back to Setup
+        </button>
+      )}
+
       {/* Title and Date */}
       <header className="text-center space-y-2">
         <p className="text-slate-400 text-sm">

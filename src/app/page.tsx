@@ -7,14 +7,17 @@ import SetupStep from "@/components/SetupStep";
 import QuestionsStep from "@/components/QuestionsStep";
 import DrawStep from "@/components/DrawStep";
 import ReadingStep from "@/components/ReadingStep";
+import ReadingHistory from "@/components/ReadingHistory";
 import { createSeededRNG, drawCards } from "@/lib/entropy";
 import { STANDARD_DECK } from "@/lib/deck";
 import {
   decodeReading,
   sharedReadingToCards,
   formatReadingDate,
+  encodeReading,
 } from "@/lib/share";
 import type { ReadingContext, ShareableReading } from "@/lib/types";
+import { readingStore } from "@/lib/db";
 
 export default function Home() {
   return (
@@ -36,6 +39,19 @@ function HomeContent() {
     null,
   );
   const [shareError, setShareError] = useState(false);
+  const [savedReadings, setSavedReadings] = useState<ShareableReading[]>([]);
+  const [viewingHistory, setViewingHistory] = useState<ShareableReading | null>(
+    null,
+  );
+
+  // Load saved readings from localStorage on mount
+  useEffect(() => {
+    const loadReadings = async () => {
+      const readings = await readingStore.getAll();
+      setSavedReadings(readings);
+    };
+    loadReadings();
+  }, []);
 
   useEffect(() => {
     const encoded = searchParams.get("r");
@@ -68,11 +84,45 @@ function HomeContent() {
     }
   }, [sharedReading, title]);
 
+  // Save shared readings to localStorage when visited
+  useEffect(() => {
+    if (sharedReading) {
+      saveReadingToHistory({ ...sharedReading, shared: true });
+    }
+  }, [sharedReading]);
+
+  const saveReadingToHistory = async (reading: ShareableReading) => {
+    const existing = await readingStore.getAll();
+    const alreadySaved = existing.some((r) => r.d === reading.d);
+    if (!alreadySaved) {
+      await readingStore.save(reading);
+      const readings = await readingStore.getAll();
+      setSavedReadings(readings);
+    }
+  };
+
   const handleReset = () => {
     setSharedReading(null);
     setShareError(false);
+    setViewingHistory(null);
     wizard.reset();
     window.history.pushState({}, "", "/");
+  };
+
+  const handleLoadHistory = (reading: ShareableReading) => {
+    setViewingHistory(reading);
+    wizard.toReading();
+  };
+
+  const handleBackToSetup = () => {
+    setViewingHistory(null);
+    wizard.reset();
+  };
+
+  const handleDeleteReading = async (timestamp: number) => {
+    await readingStore.delete(timestamp);
+    const readings = await readingStore.getAll();
+    setSavedReadings(readings);
   };
 
   const handleSetupSubmit = async () => {
@@ -139,12 +189,31 @@ function HomeContent() {
     const decoder = new TextDecoder();
 
     if (reader) {
+      let fullReading = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const chunk = decoder.decode(value);
-        setReading((prev) => prev + chunk);
+        fullReading += chunk;
+        setReading(fullReading);
       }
+
+      // Save reading to localStorage when complete
+      await saveReadingToHistory({
+        v: 1,
+        i: wizard.state.intention,
+        q: wizard.state.questions,
+        a: wizard.state.answers,
+        c: wizard.state.drawnCards.map((card) => ({
+          n: card.name,
+          r: card.reversed,
+          m: card.meaning,
+        })),
+        t: fullReading,
+        title: generatedTitle,
+        d: readingDate,
+        shared: false,
+      });
     }
 
     setStreaming(false);
@@ -169,17 +238,24 @@ function HomeContent() {
           </div>
         )}
 
-        {!sharedReading && wizard.state.step === "setup" && (
-          <SetupStep
-            intention={wizard.state.intention}
-            cardCount={wizard.state.cardCount}
-            positions={wizard.state.positions}
-            onIntentionChange={wizard.setIntention}
-            onCardCountChange={wizard.setCardCount}
-            onPositionsChange={wizard.setPositions}
-            onSubmit={handleSetupSubmit}
-            loading={loadingQuestions}
-          />
+        {!sharedReading && !viewingHistory && wizard.state.step === "setup" && (
+          <>
+            <SetupStep
+              intention={wizard.state.intention}
+              cardCount={wizard.state.cardCount}
+              positions={wizard.state.positions}
+              onIntentionChange={wizard.setIntention}
+              onCardCountChange={wizard.setCardCount}
+              onPositionsChange={wizard.setPositions}
+              onSubmit={handleSetupSubmit}
+              loading={loadingQuestions}
+            />
+            <ReadingHistory
+              readings={savedReadings}
+              onSelect={handleLoadHistory}
+              onDelete={handleDeleteReading}
+            />
+          </>
         )}
 
         {!sharedReading && wizard.state.step === "questions" && (
@@ -199,21 +275,36 @@ function HomeContent() {
           />
         )}
 
-        {(wizard.state.step === "reading" || sharedReading) && (
+        {(wizard.state.step === "reading" || sharedReading || viewingHistory) && (
           <ReadingStep
-            reading={sharedReading?.t ?? reading}
-            title={sharedReading?.title ?? title}
-            readingDate={sharedReading?.d ?? readingDate}
+            reading={
+              viewingHistory?.t ?? sharedReading?.t ?? reading
+            }
+            title={
+              viewingHistory?.title ?? sharedReading?.title ?? title
+            }
+            readingDate={
+              viewingHistory?.d ?? sharedReading?.d ?? readingDate
+            }
             streaming={streaming}
             cards={
-              sharedReading
-                ? sharedReadingToCards(sharedReading)
-                : wizard.state.drawnCards
+              viewingHistory
+                ? sharedReadingToCards(viewingHistory)
+                : sharedReading
+                  ? sharedReadingToCards(sharedReading)
+                  : wizard.state.drawnCards
             }
-            questions={sharedReading?.q ?? wizard.state.questions}
-            answers={sharedReading?.a ?? wizard.state.answers}
-            intention={sharedReading?.i ?? wizard.state.intention}
+            questions={
+              viewingHistory?.q ?? sharedReading?.q ?? wizard.state.questions
+            }
+            answers={
+              viewingHistory?.a ?? sharedReading?.a ?? wizard.state.answers
+            }
+            intention={
+              viewingHistory?.i ?? sharedReading?.i ?? wizard.state.intention
+            }
             onReset={handleReset}
+            onBack={viewingHistory ? handleBackToSetup : undefined}
           />
         )}
       </div>

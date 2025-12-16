@@ -43,4 +43,5 @@ export type ShareableReading = {
   t: string;
   title?: string;
   d: number;  // timestamp
+  shared?: boolean;  // true = from another user, false/undefined = self-generated
 };
