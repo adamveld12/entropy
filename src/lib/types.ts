@@ -41,5 +41,6 @@ export type ShareableReading = {
   a: string[];
   c: Array<{ n: string; r: boolean; m: string }>;
   t: string;
+  title?: string;
   d: number;  // timestamp
 };

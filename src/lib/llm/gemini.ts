@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { LLMService } from './interface';
-import type { ReadingContext } from '../types';
+import type { ReadingContext, DrawnCard } from '../types';
 import fs from 'fs';
 import path from 'path';
 
@@ -19,15 +19,19 @@ export function pickCategories(): string[] {
 
 export class GeminiService implements LLMService {
   private model;
+  private flashModel;
   private questionsPrompt: string;
+  private titlePrompt: string;
   private interpretationPrompt: string;
 
   constructor() {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
     this.model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
+    this.flashModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
     const promptsDir = path.join(process.cwd(), 'prompts', 'gemini');
     this.questionsPrompt = fs.readFileSync(path.join(promptsDir, 'questions.md'), 'utf-8');
+    this.titlePrompt = fs.readFileSync(path.join(promptsDir, 'title.md'), 'utf-8');
     this.interpretationPrompt = fs.readFileSync(path.join(promptsDir, 'interpretation.md'), 'utf-8');
   }
 
@@ -36,9 +40,18 @@ export class GeminiService implements LLMService {
       .replace('{{intention}}', intention)
       .replace('{{categories}}', categories.join(', '));
 
-    const result = await this.model.generateContent(prompt);
+    const result = await this.flashModel.generateContent(prompt);
     const text = result.response.text();
     return JSON.parse(text.replace(/```json\n?|\n?```/g, ''));
+  }
+
+  async generateTitle(intention: string, cards: DrawnCard[]): Promise<string> {
+    const prompt = this.titlePrompt
+      .replace('{{intention}}', intention)
+      .replace('{{cards}}', cards.map(c => `${c.name} (${c.reversed ? 'Reversed' : 'Upright'})`).join(', '));
+
+    const result = await this.flashModel.generateContent(prompt);
+    return result.response.text().trim();
   }
 
   async *interpretSpread(context: ReadingContext): AsyncGenerator<string> {

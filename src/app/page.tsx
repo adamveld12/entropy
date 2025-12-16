@@ -28,6 +28,8 @@ function HomeContent() {
   const wizard = useWizard();
   const searchParams = useSearchParams();
   const [reading, setReading] = useState("");
+  const [title, setTitle] = useState("");
+  const [readingDate, setReadingDate] = useState(Date.now());
   const [streaming, setStreaming] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
   const [sharedReading, setSharedReading] = useState<ShareableReading | null>(
@@ -84,8 +86,23 @@ function HomeContent() {
   const handleGetReading = async () => {
     setStreaming(true);
     setReading("");
+    setTitle("");
+    setReadingDate(Date.now());
     wizard.toReading();
 
+    // Generate title first
+    const titleRes = await fetch("/api/title", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        intention: wizard.state.intention,
+        cards: wizard.state.drawnCards,
+      }),
+    });
+    const { title: generatedTitle } = await titleRes.json();
+    setTitle(generatedTitle);
+
+    // Then stream the reading
     const context: ReadingContext = {
       intention: wizard.state.intention,
       answers: wizard.state.answers,
@@ -166,6 +183,8 @@ function HomeContent() {
         {(wizard.state.step === "reading" || sharedReading) && (
           <ReadingStep
             reading={sharedReading?.t ?? reading}
+            title={sharedReading?.title ?? title}
+            readingDate={sharedReading?.d ?? readingDate}
             streaming={streaming}
             cards={
               sharedReading

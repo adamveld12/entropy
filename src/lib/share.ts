@@ -6,7 +6,8 @@ export function encodeReading(
   questions: string[],
   answers: string[],
   cards: DrawnCard[],
-  reading: string
+  reading: string,
+  title?: string
 ): string {
   const data: ShareableReading = {
     v: 1,
@@ -15,6 +16,7 @@ export function encodeReading(
     a: answers,
     c: cards.map((card) => ({ n: card.name, r: card.reversed, m: card.meaning })),
     t: reading,
+    title,
     d: Date.now(),
   };
   return btoa(encodeURIComponent(JSON.stringify(data)));

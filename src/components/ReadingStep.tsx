@@ -2,11 +2,13 @@
 
 import { memo, useState } from "react";
 import { Streamdown } from "streamdown";
-import { encodeReading } from "@/lib/share";
+import { encodeReading, formatReadingDate } from "@/lib/share";
 import type { DrawnCard } from "@/lib/types";
 
 interface ReadingStepProps {
   reading: string;
+  title?: string;
+  readingDate: number;
   streaming?: boolean;
   cards: DrawnCard[];
   questions: string[];
@@ -17,6 +19,8 @@ interface ReadingStepProps {
 
 export default memo(function ReadingStep({
   reading,
+  title,
+  readingDate,
   streaming = false,
   cards,
   questions,
@@ -33,6 +37,7 @@ export default memo(function ReadingStep({
       answers,
       cards,
       reading,
+      title,
     );
     const url = `${window.location.origin}/?r=${encoded}`;
     await navigator.clipboard.writeText(url);
@@ -42,6 +47,16 @@ export default memo(function ReadingStep({
 
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-8">
+      {/* Title and Date */}
+      <header className="text-center space-y-2">
+        <p className="text-slate-400 text-sm">
+          {formatReadingDate(readingDate)}
+        </p>
+        <h2 className="text-2xl font-bold text-amber-400">
+          {title || "Loading title..."}
+        </h2>
+      </header>
+
       {/* Cards Section */}
       <section>
         <h2 className="text-amber-500 font-semibold text-lg mb-4">
