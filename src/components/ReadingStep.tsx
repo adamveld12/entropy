@@ -55,7 +55,7 @@ export default memo(function ReadingStep({
           onClick={onBack}
           className="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-2"
         >
-          ← Back to Setup
+          ← Another Reading Awaits
         </button>
       )}
 
@@ -155,7 +155,7 @@ export default memo(function ReadingStep({
           disabled={streaming}
           className="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          New Reading
+          Another Reading Awaits
         </button>
       </div>
     </div>
