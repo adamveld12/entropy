@@ -49,6 +49,25 @@ function HomeContent() {
     }
   }, [searchParams]);
 
+  // Generate title for shared readings that don't have one
+  useEffect(() => {
+    if (sharedReading && !sharedReading.title && !title) {
+      const generateTitle = async () => {
+        const res = await fetch("/api/title", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intention: sharedReading.i,
+            cards: sharedReadingToCards(sharedReading),
+          }),
+        });
+        const { title: generatedTitle } = await res.json();
+        setTitle(generatedTitle);
+      };
+      generateTitle();
+    }
+  }, [sharedReading, title]);
+
   const handleReset = () => {
     setSharedReading(null);
     setShareError(false);
