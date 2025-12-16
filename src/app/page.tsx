@@ -14,7 +14,6 @@ import {
   decodeReading,
   sharedReadingToCards,
   formatReadingDate,
-  encodeReading,
 } from "@/lib/share";
 import type { ReadingContext, ShareableReading, DrawnCard } from "@/lib/types";
 import { readingStore } from "@/lib/db";
@@ -43,6 +42,7 @@ function HomeContent() {
   const [viewingHistory, setViewingHistory] = useState<ShareableReading | null>(
     null,
   );
+  const [shareId, setShareId] = useState<string | null>(null);
 
   // Load saved readings from localStorage on mount
   useEffect(() => {
@@ -56,11 +56,31 @@ function HomeContent() {
   useEffect(() => {
     const encoded = searchParams.get("r");
     if (encoded) {
-      const decoded = decodeReading(encoded);
-      if (decoded) {
-        setSharedReading(decoded);
+      // Check if it's a NanoID (short, URL-safe alphanumeric) or legacy base64
+      if (encoded.length <= 21 && /^[A-Za-z0-9_-]+$/.test(encoded)) {
+        // NanoID - fetch from API
+        fetch(`/api/readings?id=${encoded}`)
+          .then((res) => {
+            if (res.ok) {
+              return res.json();
+            }
+            throw new Error("Reading not found");
+          })
+          .then((reading: ShareableReading) => {
+            setSharedReading(reading);
+            setShareId(encoded);
+          })
+          .catch(() => {
+            setShareError(true);
+          });
       } else {
-        setShareError(true);
+        // Legacy base64 - decode directly
+        const decoded = decodeReading(encoded);
+        if (decoded) {
+          setSharedReading(decoded);
+        } else {
+          setShareError(true);
+        }
       }
     }
   }, [searchParams]);
@@ -98,15 +118,22 @@ function HomeContent() {
       const readings = await readingStore.getAll();
       setSavedReadings(readings);
 
-      // Save generated readings to backend (fire-and-forget)
+      // Save generated readings to backend and capture shareId
       if (!reading.shared) {
         fetch("/api/readings", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reading),
-        }).catch((error) => {
-          console.error("Failed to save reading to backend:", error);
-        });
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.shareId) {
+              setShareId(data.shareId);
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to save reading to backend:", error);
+          });
       }
     }
   };
@@ -321,6 +348,7 @@ function HomeContent() {
             intention={
               viewingHistory?.i ?? sharedReading?.i ?? wizard.state.intention
             }
+            shareId={shareId ?? undefined}
             onReset={handleReset}
             onBack={viewingHistory ? handleBackToSetup : undefined}
           />

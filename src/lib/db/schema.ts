@@ -1,7 +1,9 @@
 import { pgTable, text, smallint, bigint, jsonb } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
 
 export const readingsAnonymous = pgTable("readings_anonymous", {
   id: bigint("id", { mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+  shareId: text("share_id").notNull().unique().$defaultFn(() => nanoid(12)),
   version: smallint("version").notNull().default(1),
   intention: text("intention").notNull(),
   questions: text("questions").array().notNull(),

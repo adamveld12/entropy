@@ -2,7 +2,7 @@
 
 import { memo, useState } from "react";
 import { Streamdown } from "streamdown";
-import { encodeReading, formatReadingDate } from "@/lib/share";
+import { formatReadingDate } from "@/lib/share";
 import type { DrawnCard } from "@/lib/types";
 
 interface ReadingStepProps {
@@ -14,6 +14,7 @@ interface ReadingStepProps {
   questions: string[];
   answers: string[];
   intention: string;
+  shareId?: string;
   onReset: () => void;
   onBack?: () => void;
 }
@@ -27,21 +28,15 @@ export default memo(function ReadingStep({
   questions,
   answers,
   intention,
+  shareId,
   onReset,
   onBack,
 }: ReadingStepProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const encoded = encodeReading(
-      intention,
-      questions,
-      answers,
-      cards,
-      reading,
-      title,
-    );
-    const url = `${window.location.origin}/?r=${encoded}`;
+    if (!shareId) return;
+    const url = `${window.location.origin}/?r=${shareId}`;
     await navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

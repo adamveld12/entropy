@@ -1,27 +1,7 @@
 import type { ShareableReading, DrawnCard } from './types';
 import { STANDARD_DECK } from './deck';
 
-export function encodeReading(
-  intention: string,
-  questions: string[],
-  answers: string[],
-  cards: DrawnCard[],
-  reading: string,
-  title?: string
-): string {
-  const data: ShareableReading = {
-    v: 1,
-    i: intention,
-    q: questions,
-    a: answers,
-    c: cards.map((card) => ({ n: card.name, r: card.reversed, m: card.meaning })),
-    t: reading,
-    title,
-    d: Date.now(),
-  };
-  return btoa(encodeURIComponent(JSON.stringify(data)));
-}
-
+// Legacy function for backwards compatibility with old base64 URLs
 export function decodeReading(encoded: string): ShareableReading | null {
   try {
     const json = decodeURIComponent(atob(encoded));
