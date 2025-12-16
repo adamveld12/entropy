@@ -16,7 +16,7 @@ import {
   formatReadingDate,
   encodeReading,
 } from "@/lib/share";
-import type { ReadingContext, ShareableReading } from "@/lib/types";
+import type { ReadingContext, ShareableReading, DrawnCard } from "@/lib/types";
 import { readingStore } from "@/lib/db";
 
 export default function Home() {
@@ -65,30 +65,29 @@ function HomeContent() {
     }
   }, [searchParams]);
 
-  // Generate title for shared readings that don't have one
+  // Handle shared readings: generate title if needed, then save
   useEffect(() => {
-    if (sharedReading && !sharedReading.title && !title) {
-      const generateTitle = async () => {
-        const res = await fetch("/api/title", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            intention: sharedReading.i,
-            cards: sharedReadingToCards(sharedReading),
-          }),
-        });
-        const { title: generatedTitle } = await res.json();
-        setTitle(generatedTitle);
-      };
-      generateTitle();
-    }
-  }, [sharedReading, title]);
+    if (!sharedReading) return;
 
-  // Save shared readings to localStorage when visited
-  useEffect(() => {
-    if (sharedReading) {
-      saveReadingToHistory({ ...sharedReading, shared: true });
-    }
+    const handleSharedReading = async () => {
+      let readingTitle = sharedReading.title;
+
+      if (!readingTitle) {
+        readingTitle = await generateReadingTitle(
+          sharedReading.i,
+          sharedReadingToCards(sharedReading),
+        );
+        setTitle(readingTitle);
+      }
+
+      await saveReadingToHistory({
+        ...sharedReading,
+        title: readingTitle,
+        shared: true,
+      });
+    };
+
+    handleSharedReading();
   }, [sharedReading]);
 
   const saveReadingToHistory = async (reading: ShareableReading) => {
@@ -99,6 +98,19 @@ function HomeContent() {
       const readings = await readingStore.getAll();
       setSavedReadings(readings);
     }
+  };
+
+  const generateReadingTitle = async (
+    intention: string,
+    cards: DrawnCard[],
+  ) => {
+    const res = await fetch("/api/title", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ intention, cards }),
+    });
+    const { title } = await res.json();
+    return title;
   };
 
   const handleReset = () => {
@@ -160,15 +172,10 @@ function HomeContent() {
     wizard.toReading();
 
     // Generate title first
-    const titleRes = await fetch("/api/title", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        intention: wizard.state.intention,
-        cards: wizard.state.drawnCards,
-      }),
-    });
-    const { title: generatedTitle } = await titleRes.json();
+    const generatedTitle = await generateReadingTitle(
+      wizard.state.intention,
+      wizard.state.drawnCards,
+    );
     setTitle(generatedTitle);
 
     // Then stream the reading
