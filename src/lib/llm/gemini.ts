@@ -1,6 +1,8 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { LLMService } from './interface';
 import type { ReadingContext } from '../types';
+import fs from 'fs';
+import path from 'path';
 
 export const CATEGORIES = [
   'Sensory (Smell, Sound, Texture)',
@@ -17,16 +19,22 @@ export function pickCategories(): string[] {
 
 export class GeminiService implements LLMService {
   private model;
+  private questionsPrompt: string;
+  private interpretationPrompt: string;
 
   constructor() {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
     this.model = genAI.getGenerativeModel({ model: 'gemini-3-pro-preview' });
+
+    const promptsDir = path.join(process.cwd(), 'prompts', 'gemini');
+    this.questionsPrompt = fs.readFileSync(path.join(promptsDir, 'questions.md'), 'utf-8');
+    this.interpretationPrompt = fs.readFileSync(path.join(promptsDir, 'interpretation.md'), 'utf-8');
   }
 
   async generateQuestions(intention: string, categories: string[]): Promise<string[]> {
-    const prompt = `Generate 3 abstract, mystical questions for a tarot reading with intention: "${intention}".
-Use these categories: ${categories.join(', ')}.
-Return only valid JSON array of strings, no markdown.`;
+    const prompt = this.questionsPrompt
+      .replace('{{intention}}', intention)
+      .replace('{{categories}}', categories.join(', '));
 
     const result = await this.model.generateContent(prompt);
     const text = result.response.text();
@@ -34,13 +42,11 @@ Return only valid JSON array of strings, no markdown.`;
   }
 
   async *interpretSpread(context: ReadingContext): AsyncGenerator<string> {
-    const prompt = `You are a mystical tarot reader. Provide a flowing interpretation for:
-Intention: ${context.intention}
-Reflections: ${context.answers.join(' | ')}
-Cards: ${context.cards.map(c => `${c.meaning}: ${c.name} (${c.reversed ? 'Reversed' : 'Upright'})`).join(', ')}
-Theme: ${context.deckTheme}
-
-Write in a mystical, poetic style. Stream your interpretation naturally.`;
+    const prompt = this.interpretationPrompt
+      .replace('{{intention}}', context.intention)
+      .replace('{{answers}}', context.answers.join(' | '))
+      .replace('{{cards}}', context.cards.map(c => `${c.meaning}: ${c.name} (${c.reversed ? 'Reversed' : 'Upright'})`).join(', '))
+      .replace('{{deckTheme}}', context.deckTheme);
 
     const result = await this.model.generateContentStream(prompt);
     for await (const chunk of result.stream) {
