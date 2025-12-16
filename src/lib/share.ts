@@ -1,4 +1,5 @@
 import type { ShareableReading, DrawnCard } from './types';
+import { STANDARD_DECK } from './deck';
 
 export function encodeReading(
   intention: string,
@@ -31,14 +32,17 @@ export function decodeReading(encoded: string): ShareableReading | null {
 }
 
 export function sharedReadingToCards(reading: ShareableReading): DrawnCard[] {
-  return reading.c.map((c, i) => ({
-    id: `shared-${i}`,
-    name: c.n,
-    image: '',
-    reversed: c.r,
-    position: i,
-    meaning: c.m,
-  }));
+  return reading.c.map((c, i) => {
+    const deckCard = STANDARD_DECK.cards.find(card => card.name === c.n);
+    return {
+      id: deckCard?.id || `shared-${i}`,
+      name: c.n,
+      image: deckCard?.image || '',
+      reversed: c.r,
+      position: i,
+      meaning: c.m,
+    };
+  });
 }
 
 export function formatReadingDate(timestamp: number): string {

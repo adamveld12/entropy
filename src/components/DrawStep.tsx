@@ -18,16 +18,14 @@ export default memo(function DrawStep({
 }: DrawStepProps) {
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-6 flex-col">
-      <div className="flex content-around">
+      <div className="flex justify-evenly gap-4">
         {cards.map((card, index) => (
-          <div key={index} className="bg-slate-800 rounded-lg p-4 space-y-2">
-            <div
-              className={`aspect-[2/3] bg-gradient-to-br from-amber-900/50 to-slate-900 rounded flex items-center justify-center border border-amber-500/30 ${card.reversed ? "rotate-180" : ""} transition-transform`}
-            >
-              <span className="text-amber-500/70 text-xs text-center px-2 font-serif">
-                {card.name}
-              </span>
-            </div>
+          <div key={index} className="bg-slate-800 rounded-lg p-4 space-y-2 w-48">
+            <img
+              src={card.image}
+              alt={card.name}
+              className={`w-full aspect-[2/3] rounded border border-amber-500/30 object-cover ${card.reversed ? "rotate-180" : ""} transition-transform`}
+            />
             <div className="text-center">
               <p className="text-amber-500 font-semibold text-sm">
                 {card.name}

@@ -9,7 +9,11 @@ import DrawStep from "@/components/DrawStep";
 import ReadingStep from "@/components/ReadingStep";
 import { createSeededRNG, drawCards } from "@/lib/entropy";
 import { STANDARD_DECK } from "@/lib/deck";
-import { decodeReading, sharedReadingToCards, formatReadingDate } from "@/lib/share";
+import {
+  decodeReading,
+  sharedReadingToCards,
+  formatReadingDate,
+} from "@/lib/share";
 import type { ReadingContext, ShareableReading } from "@/lib/types";
 
 export default function Home() {
@@ -113,15 +117,6 @@ function HomeContent() {
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
       <div className="max-w-3xl w-full space-y-6">
-        {sharedReading && (
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg px-4 py-2 text-center">
-            <p className="text-amber-400 text-sm">Shared Reading</p>
-            <p className="text-slate-400 text-xs mt-1">
-              {formatReadingDate(sharedReading.d)}
-            </p>
-          </div>
-        )}
-
         <div className="text-center">
           <h1 className="text-4xl font-bold text-amber-400 tracking-wide">
             Entropy
@@ -171,6 +166,7 @@ function HomeContent() {
         {(wizard.state.step === "reading" || sharedReading) && (
           <ReadingStep
             reading={sharedReading?.t ?? reading}
+            streaming={streaming}
             cards={
               sharedReading
                 ? sharedReadingToCards(sharedReading)

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { memo } from 'react';
-import { Spinner } from './Spinner';
+import { memo } from "react";
+import { Spinner } from "./Spinner";
 
 interface SetupStepProps {
   intention: string;
@@ -32,11 +32,15 @@ export default memo(function SetupStep({
 
   const handleCardCountChange = (count: number): void => {
     onCardCountChange(count);
-    const newPositions = Array.from({ length: count }, (_, i) => positions[i] || '');
+    const newPositions = Array.from(
+      { length: count },
+      (_, i) => positions[i] || "",
+    );
     onPositionsChange(newPositions);
   };
 
-  const isValid = intention.trim().length > 0 && positions.every(p => p.trim().length > 0);
+  const isValid =
+    intention.trim().length > 0 && positions.every((p) => p.trim().length > 0);
 
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-6">
@@ -94,10 +98,10 @@ export default memo(function SetupStep({
         {loading ? (
           <>
             <Spinner className="text-slate-900 mr-2" />
-            Generating Questions...
+            Contemplating Questions...
           </>
         ) : (
-          'Generate Questions'
+          "Question Me"
         )}
       </button>
     </div>
