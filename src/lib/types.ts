@@ -44,4 +44,5 @@ export type ShareableReading = {
   title?: string;
   d: number;  // timestamp
   shared?: boolean;  // true = from another user, false/undefined = self-generated
+  shareId?: string;  // database ID for sharing
 };

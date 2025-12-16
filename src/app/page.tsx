@@ -125,10 +125,15 @@ function HomeContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reading),
         })
-          .then((res) => res.json())
+          .then((res) => {
+            if (!res.ok) throw new Error("Failed to save reading");
+            return res.json();
+          })
           .then((data) => {
             if (data.shareId) {
               setShareId(data.shareId);
+              // Update localStorage with shareId
+              readingStore.save({ ...reading, shareId: data.shareId });
             }
           })
           .catch((error) => {
@@ -155,12 +160,14 @@ function HomeContent() {
     setSharedReading(null);
     setShareError(false);
     setViewingHistory(null);
+    setShareId(null);
     wizard.reset();
     window.history.pushState({}, "", "/");
   };
 
   const handleLoadHistory = (reading: ShareableReading) => {
     setViewingHistory(reading);
+    setShareId(reading.shareId ?? null);
     wizard.toReading();
   };
 

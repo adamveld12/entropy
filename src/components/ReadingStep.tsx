@@ -140,10 +140,10 @@ export default memo(function ReadingStep({
       <div className="flex gap-4">
         <button
           onClick={handleShare}
-          disabled={streaming}
+          disabled={streaming || !shareId}
           className="flex-1 bg-slate-700 hover:bg-slate-600 text-slate-100 font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {copied ? "Copied!" : "Share Reading"}
+          {!shareId ? "Saving..." : copied ? "Copied!" : "Share Reading"}
         </button>
         <button
           onClick={onReset}
