@@ -1,0 +1,7 @@
+{
+  "model": "opusplan",
+  "permissions": {
+    "allow": [],
+    "ask": ["Skill(dev:gemini-imagegen)"]
+  }
+}
