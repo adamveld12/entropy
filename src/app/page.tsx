@@ -80,6 +80,7 @@ function HomeContent() {
   const handleGetReading = async () => {
     setStreaming(true);
     setReading("");
+    wizard.toReading();
 
     const context: ReadingContext = {
       intention: wizard.state.intention,
@@ -106,7 +107,6 @@ function HomeContent() {
       }
     }
 
-    wizard.toReading();
     setStreaming(false);
   };
 
