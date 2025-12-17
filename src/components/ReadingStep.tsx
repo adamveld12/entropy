@@ -3,6 +3,7 @@
 import { memo, useState } from "react";
 import { Streamdown } from "streamdown";
 import { formatReadingDate } from "@/lib/share";
+import { TarotCard } from "./TarotCard";
 import type { DrawnCard } from "@/lib/types";
 
 interface ReadingStepProps {
@@ -71,25 +72,7 @@ export default memo(function ReadingStep({
         </h2>
         <div className="flex justify-evenly gap-4">
           {cards.map((card, index) => (
-            <div
-              key={index}
-              className="bg-slate-800 rounded-lg p-4 space-y-2 w-48"
-            >
-              <img
-                src={card.image}
-                alt={card.name}
-                className={`w-full aspect-[2/3] rounded border border-amber-500/30 object-cover ${card.reversed ? "rotate-180" : ""} transition-transform`}
-              />
-              <div className="text-center">
-                <p className="text-amber-500 font-semibold text-sm">
-                  {card.name}
-                </p>
-                {card.reversed && (
-                  <p className="text-slate-400 text-xs italic">Reversed</p>
-                )}
-                <p className="text-slate-300 text-xs mt-1">{card.meaning}</p>
-              </div>
-            </div>
+            <TarotCard key={index} card={card} />
           ))}
         </div>
       </section>

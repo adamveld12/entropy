@@ -17,6 +17,8 @@ import {
 } from "@/lib/share";
 import type { ReadingContext, ShareableReading, DrawnCard } from "@/lib/types";
 import { readingStore } from "@/lib/db";
+import { AnimatePresence } from "motion/react";
+import { AnimatedStep } from "@/components/AnimatedStep";
 
 export default function Home() {
   return (
@@ -290,76 +292,84 @@ function HomeContent() {
           </div>
         )}
 
-        {!sharedReading && !viewingHistory && wizard.state.step === "setup" && (
-          <>
-            <SetupStep
-              intention={wizard.state.intention}
-              cardCount={wizard.state.cardCount}
-              positions={wizard.state.positions}
-              onIntentionChange={wizard.setIntention}
-              onCardCountChange={wizard.setCardCount}
-              onPositionsChange={wizard.setPositions}
-              onSubmit={handleSetupSubmit}
-              loading={loadingQuestions}
-            />
-            <ReadingHistory
-              readings={savedReadings}
-              onSelect={handleLoadHistory}
-              onDelete={handleDeleteReading}
-            />
-          </>
-        )}
+        <AnimatePresence mode="wait">
+          {!sharedReading && !viewingHistory && wizard.state.step === "setup" && (
+            <AnimatedStep stepKey="setup">
+              <SetupStep
+                intention={wizard.state.intention}
+                cardCount={wizard.state.cardCount}
+                positions={wizard.state.positions}
+                onIntentionChange={wizard.setIntention}
+                onCardCountChange={wizard.setCardCount}
+                onPositionsChange={wizard.setPositions}
+                onSubmit={handleSetupSubmit}
+                loading={loadingQuestions}
+              />
+              <ReadingHistory
+                readings={savedReadings}
+                onSelect={handleLoadHistory}
+                onDelete={handleDeleteReading}
+              />
+            </AnimatedStep>
+          )}
 
-        {!sharedReading && wizard.state.step === "questions" && (
-          <QuestionsStep
-            questions={wizard.state.questions}
-            answers={wizard.state.answers}
-            onAnswersChange={wizard.setAnswers}
-            onSubmit={handleQuestionsSubmit}
-          />
-        )}
+          {!sharedReading && wizard.state.step === "questions" && (
+            <AnimatedStep stepKey="questions">
+              <QuestionsStep
+                questions={wizard.state.questions}
+                answers={wizard.state.answers}
+                onAnswersChange={wizard.setAnswers}
+                onSubmit={handleQuestionsSubmit}
+              />
+            </AnimatedStep>
+          )}
 
-        {!sharedReading && wizard.state.step === "draw" && (
-          <DrawStep
-            cards={wizard.state.drawnCards}
-            onGetReading={handleGetReading}
-            streaming={streaming}
-          />
-        )}
+          {!sharedReading && wizard.state.step === "draw" && (
+            <AnimatedStep stepKey="draw">
+              <DrawStep
+                cards={wizard.state.drawnCards}
+                onGetReading={handleGetReading}
+                streaming={streaming}
+              />
+            </AnimatedStep>
+          )}
 
-        {(wizard.state.step === "reading" || sharedReading || viewingHistory) && (
-          <ReadingStep
-            reading={
-              viewingHistory?.t ?? sharedReading?.t ?? reading
-            }
-            title={
-              viewingHistory?.title ?? sharedReading?.title ?? title
-            }
-            readingDate={
-              viewingHistory?.d ?? sharedReading?.d ?? readingDate
-            }
-            streaming={streaming}
-            cards={
-              viewingHistory
-                ? sharedReadingToCards(viewingHistory)
-                : sharedReading
-                  ? sharedReadingToCards(sharedReading)
-                  : wizard.state.drawnCards
-            }
-            questions={
-              viewingHistory?.q ?? sharedReading?.q ?? wizard.state.questions
-            }
-            answers={
-              viewingHistory?.a ?? sharedReading?.a ?? wizard.state.answers
-            }
-            intention={
-              viewingHistory?.i ?? sharedReading?.i ?? wizard.state.intention
-            }
-            shareId={shareId ?? undefined}
-            onReset={handleReset}
-            onBack={viewingHistory ? handleBackToSetup : undefined}
-          />
-        )}
+          {(wizard.state.step === "reading" || sharedReading || viewingHistory) && (
+            <AnimatedStep stepKey="reading">
+              <ReadingStep
+                reading={
+                  viewingHistory?.t ?? sharedReading?.t ?? reading
+                }
+                title={
+                  viewingHistory?.title ?? sharedReading?.title ?? title
+                }
+                readingDate={
+                  viewingHistory?.d ?? sharedReading?.d ?? readingDate
+                }
+                streaming={streaming}
+                cards={
+                  viewingHistory
+                    ? sharedReadingToCards(viewingHistory)
+                    : sharedReading
+                      ? sharedReadingToCards(sharedReading)
+                      : wizard.state.drawnCards
+                }
+                questions={
+                  viewingHistory?.q ?? sharedReading?.q ?? wizard.state.questions
+                }
+                answers={
+                  viewingHistory?.a ?? sharedReading?.a ?? wizard.state.answers
+                }
+                intention={
+                  viewingHistory?.i ?? sharedReading?.i ?? wizard.state.intention
+                }
+                shareId={shareId ?? undefined}
+                onReset={handleReset}
+                onBack={viewingHistory ? handleBackToSetup : undefined}
+              />
+            </AnimatedStep>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
