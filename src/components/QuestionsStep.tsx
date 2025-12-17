@@ -7,6 +7,8 @@ interface QuestionsStepProps {
   answers: string[];
   onAnswersChange: (answers: string[]) => void;
   onSubmit: () => void;
+  onRegenerateQuestion: (index: number) => Promise<void>;
+  regeneratingIndex: number | null;
 }
 
 export default memo(function QuestionsStep({
@@ -14,6 +16,8 @@ export default memo(function QuestionsStep({
   answers,
   onAnswersChange,
   onSubmit,
+  onRegenerateQuestion,
+  regeneratingIndex,
 }: QuestionsStepProps) {
   const handleAnswerChange = (index: number, value: string): void => {
     const newAnswers = [...answers];
@@ -27,9 +31,27 @@ export default memo(function QuestionsStep({
     <div className="bg-slate-900 rounded-lg p-8 space-y-6">
       {questions.map((question, index) => (
         <div key={index}>
-          <label className="block text-amber-500 text-sm font-semibold mb-2">
-            {question}
-          </label>
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <label
+              className={`text-amber-500 text-sm font-semibold flex-1 ${
+                regeneratingIndex === index ? 'animate-pulse' : ''
+              }`}
+            >
+              {question}
+            </label>
+            {!answers[index]?.trim() && (
+              <button
+                onClick={() => onRegenerateQuestion(index)}
+                disabled={regeneratingIndex !== null}
+                className="w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-full text-amber-400 hover:text-amber-300 hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Generate different question"
+              >
+                <span className={regeneratingIndex === index ? 'animate-spin' : ''}>
+                  ↻
+                </span>
+              </button>
+            )}
+          </div>
           <textarea
             value={answers[index] || ''}
             onChange={(e) => handleAnswerChange(index, e.target.value)}
@@ -42,7 +64,7 @@ export default memo(function QuestionsStep({
 
       <button
         onClick={onSubmit}
-        disabled={!isValid}
+        disabled={!isValid || regeneratingIndex !== null}
         className="w-full bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:text-slate-500 text-slate-900 font-bold py-3 px-6 rounded transition-colors"
       >
         Draw Cards

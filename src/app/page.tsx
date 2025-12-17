@@ -36,6 +36,7 @@ function HomeContent() {
   const [readingDate, setReadingDate] = useState(Date.now());
   const [streaming, setStreaming] = useState(false);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const [sharedReading, setSharedReading] = useState<ShareableReading | null>(
     null,
   );
@@ -200,6 +201,27 @@ function HomeContent() {
     }
   };
 
+  const handleRegenerateQuestion = async (index: number) => {
+    setRegeneratingIndex(index);
+    try {
+      const existingQuestions = wizard.state.questions.filter((_, i) => i !== index);
+      const res = await fetch("/api/questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          intention: wizard.state.intention,
+          count: 1,
+          existingQuestions,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to regenerate question");
+      const { questions } = await res.json();
+      wizard.replaceQuestion(index, questions[0]);
+    } finally {
+      setRegeneratingIndex(null);
+    }
+  };
+
   const handleQuestionsSubmit = async () => {
     const rng = await createSeededRNG(wizard.state.answers);
     const cards = drawCards(
@@ -228,6 +250,7 @@ function HomeContent() {
     // Then stream the reading
     const context: ReadingContext = {
       intention: wizard.state.intention,
+      questions: wizard.state.questions,
       answers: wizard.state.answers,
       cards: wizard.state.drawnCards,
       deckTheme: STANDARD_DECK.themePrompt,
@@ -320,6 +343,8 @@ function HomeContent() {
                 answers={wizard.state.answers}
                 onAnswersChange={wizard.setAnswers}
                 onSubmit={handleQuestionsSubmit}
+                onRegenerateQuestion={handleRegenerateQuestion}
+                regeneratingIndex={regeneratingIndex}
               />
             </AnimatedStep>
           )}

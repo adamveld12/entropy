@@ -19,6 +19,7 @@ export type DrawnCard = Card & {
 
 export type ReadingContext = {
   intention: string;
+  questions: string[];
   answers: string[];
   cards: DrawnCard[];
   deckTheme: string;

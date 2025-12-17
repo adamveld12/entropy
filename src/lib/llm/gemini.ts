@@ -35,10 +35,17 @@ export class GeminiService implements LLMService {
     this.interpretationPrompt = fs.readFileSync(path.join(promptsDir, 'interpretation.md'), 'utf-8');
   }
 
-  async generateQuestions(intention: string, categories: string[]): Promise<string[]> {
+  async generateQuestions(
+    intention: string,
+    categories: string[],
+    count: number = 3,
+    existingQuestions: string[] = []
+  ): Promise<string[]> {
     const prompt = this.questionsPrompt
       .replace('{{intention}}', intention)
-      .replace('{{categories}}', categories.join(', '));
+      .replace('{{categories}}', categories.join(', '))
+      .replace('{{count}}', count.toString())
+      .replace('{{existingQuestions}}', existingQuestions.join(', '));
 
     const result = await this.flashModel.generateContent(prompt);
     const text = result.response.text();
@@ -55,9 +62,17 @@ export class GeminiService implements LLMService {
   }
 
   async *interpretSpread(context: ReadingContext): AsyncGenerator<string> {
+    const reflections = context.questions.map((q, i) => {
+      const answer = context.answers[i]?.trim();
+      return `<reflection>
+<question>${q}</question>
+<answer>${answer || 'No Response given'}</answer>
+</reflection>`;
+    }).join('\n\n');
+
     const prompt = this.interpretationPrompt
       .replace('{{intention}}', context.intention)
-      .replace('{{answers}}', context.answers.join(' | '))
+      .replace('{{reflections}}', reflections)
       .replace('{{cards}}', context.cards.map(c => `${c.meaning}: ${c.name} (${c.reversed ? 'Reversed' : 'Upright'})`).join(', '))
       .replace('{{deckTheme}}', context.deckTheme);
 

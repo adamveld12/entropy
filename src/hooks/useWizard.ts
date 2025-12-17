@@ -38,6 +38,14 @@ export function useWizard() {
     setState((s) => ({ ...s, answers }));
   };
 
+  const replaceQuestion = (index: number, newQuestion: string) => {
+    setState((s) => ({
+      ...s,
+      questions: s.questions.map((q, i) => (i === index ? newQuestion : q)),
+      answers: s.answers.map((a, i) => (i === index ? '' : a)),
+    }));
+  };
+
   const setDrawnCards = (cards: DrawnCard[]) => {
     setState((s) => ({ ...s, drawnCards: cards, step: 'draw' }));
   };
@@ -57,6 +65,7 @@ export function useWizard() {
     setPositions,
     setQuestions,
     setAnswers,
+    replaceQuestion,
     setDrawnCards,
     toReading,
     reset,
