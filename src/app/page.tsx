@@ -294,7 +294,7 @@ function HomeContent() {
 
         <AnimatePresence mode="wait">
           {!sharedReading && !viewingHistory && wizard.state.step === "setup" && (
-            <AnimatedStep stepKey="setup">
+            <AnimatedStep key="setup">
               <SetupStep
                 intention={wizard.state.intention}
                 cardCount={wizard.state.cardCount}
@@ -314,7 +314,7 @@ function HomeContent() {
           )}
 
           {!sharedReading && wizard.state.step === "questions" && (
-            <AnimatedStep stepKey="questions">
+            <AnimatedStep key="questions">
               <QuestionsStep
                 questions={wizard.state.questions}
                 answers={wizard.state.answers}
@@ -325,7 +325,7 @@ function HomeContent() {
           )}
 
           {!sharedReading && wizard.state.step === "draw" && (
-            <AnimatedStep stepKey="draw">
+            <AnimatedStep key="draw">
               <DrawStep
                 cards={wizard.state.drawnCards}
                 onGetReading={handleGetReading}
@@ -335,7 +335,7 @@ function HomeContent() {
           )}
 
           {(wizard.state.step === "reading" || sharedReading || viewingHistory) && (
-            <AnimatedStep stepKey="reading">
+            <AnimatedStep key="reading">
               <ReadingStep
                 reading={
                   viewingHistory?.t ?? sharedReading?.t ?? reading

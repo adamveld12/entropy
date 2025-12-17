@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 
 interface AnimatedStepProps {
   children: ReactNode;
-  stepKey: string;
 }
 
 const stepVariants: Variants = {
@@ -17,10 +16,9 @@ const stepTransition: Transition = {
   ease: "easeOut",
 };
 
-export function AnimatedStep({ children, stepKey }: AnimatedStepProps) {
+export function AnimatedStep({ children }: AnimatedStepProps) {
   return (
     <motion.div
-      key={stepKey}
       variants={stepVariants}
       transition={stepTransition}
     >
