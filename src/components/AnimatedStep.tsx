@@ -20,6 +20,9 @@ export function AnimatedStep({ children }: AnimatedStepProps) {
   return (
     <motion.div
       variants={stepVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       transition={stepTransition}
     >
       {children}
