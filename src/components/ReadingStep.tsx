@@ -98,7 +98,9 @@ export default memo(function ReadingStep({
               <p className="text-amber-400 text-sm font-medium mb-2">
                 {question}
               </p>
-              <p className="text-slate-300 text-sm">{answers[index]}</p>
+              <p className={`text-sm ${answers[index]?.trim() ? 'text-slate-300' : 'text-slate-500 italic'}`}>
+                {answers[index]?.trim() || 'Left unanswered'}
+              </p>
             </div>
           ))}
         </div>
