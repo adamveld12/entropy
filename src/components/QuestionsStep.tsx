@@ -25,7 +25,7 @@ export default memo(function QuestionsStep({
     onAnswersChange(newAnswers);
   };
 
-  const isValid = answers.every(a => a.trim().length > 0);
+  const isValid = answers.every(a => (a ?? '').trim().length > 0);
 
   return (
     <div className="bg-slate-900 rounded-lg p-8 space-y-6">
@@ -46,7 +46,7 @@ export default memo(function QuestionsStep({
                 className="w-11 h-11 flex-shrink-0 flex items-center justify-center rounded-full text-amber-400 hover:text-amber-300 hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Generate different question"
               >
-                <span className={regeneratingIndex === index ? 'animate-spin' : ''}>
+                <span className={`text-2xl ${regeneratingIndex === index ? 'animate-spin' : ''}`}>
                   ↻
                 </span>
               </button>
